@@ -24,14 +24,16 @@ Prototype Refactor
   * dimensions (These represent the character's size in the video game)
   * destroy() // prototype method that returns: `${this.name} was removed from the game.`
 */
-function GameObject(attrs) {
-  this.createdAt = attrs.createdAt;
-  this.name = attrs.name;
-  this.dimensions = attrs.dimensions;
+class GameObject {
+  constructor(attrs) {
+    this.createdAt = attrs.createdAt;
+    this.name = attrs.name;
+    this.dimensions = attrs.dimensions;
+  }
+  destroy() {
+    return `${this.name} was removed from the game.`;
+  }
 }
-GameObject.prototype.destroy = function() {
-  return `${this.name} was removed from the game.`;
-};
 
 /*
   === CharacterStats ===
@@ -39,13 +41,14 @@ GameObject.prototype.destroy = function() {
   * takeDamage() // prototype method -> returns the string '<object name> took damage.'
   * should inherit destroy() from GameObject's prototype
 */
-function CharacterStats(attrs) {
-  GameObject.call(this, attrs);
-  this.healthPoints = attrs.healthPoints;
-}
-CharacterStats.prototype = Object.create(GameObject.prototype);
-CharacterStats.prototype.takeDamage = function () {
-  return `${this.name} took damage.`;
+class CharacterStats extends GameObject {
+  constructor(attrs) {
+    super(attrs);
+    this.healthPoints = attrs.healthPoints;
+  }
+  takeDamage() {
+    return `${this.name} took damage.`;
+  }
 }
 
 
@@ -58,23 +61,22 @@ CharacterStats.prototype.takeDamage = function () {
   * should inherit destroy() from GameObject through CharacterStats
   * should inherit takeDamage() from CharacterStats
 */
-function Humanoid(attrs) {
-  CharacterStats.call(this, attrs);
-  this.team = attrs.team;
-  this.weapons = attrs.weapons;
-  this.language = attrs.language;
-}
-Humanoid.prototype = Object.create(CharacterStats.prototype);
-Humanoid.prototype.greet = function () {
-  return `${this.name} offers a greeting in ${this.language}.`;
+class Humanoid extends CharacterStats {
+  constructor(attrs) {
+    super(attrs);
+    this.team = attrs.team;
+    this.weapons = attrs.weapons;
+    this.language = attrs.language;
+  }
+  greet() {
+    return `${this.name} offers a greeting in ${this.language}.`;
+  }
 }
 /*
   * Inheritance chain: GameObject -> CharacterStats -> Humanoid
   * Instances of Humanoid should have all of the same properties as CharacterStats and GameObject.
   * Instances of CharacterStats should have all of the same properties as GameObject.
 */
-
-// Hero
 
 // Test you work by un-commenting these 3 objects and the list of console logs below:
 
@@ -141,37 +143,37 @@ Humanoid.prototype.greet = function () {
   console.log(swordsman.destroy()); // Sir Mustachio was removed from the game.
 
 
-  // Stretch task: 
-  // * Create Villain and Hero constructor functions that inherit from the Humanoid constructor function.  
-  // * Give the Hero and Villains different methods that could be used to remove health points from objects which could result in destruction if health gets to 0 or drops below 0;
-  // * Create two new objects, one a villain and one a hero and fight it out with methods!
-  function Hero(attrs) {
-    Humanoid.call(this, attrs);
+// Stretch task: 
+// * Create Villain and Hero constructor functions that inherit from the Humanoid constructor function.  
+// * Give the Hero and Villains different methods that could be used to remove health points from objects which could result in destruction if health gets to 0 or drops below 0;
+// * Create two new objects, one a villain and one a hero and fight it out with methods!
+class Hero extends Humanoid {
+  constructor(attrs) {
+    super(attrs);
     this.power = attrs.power;
     this.speech = attrs.speech;
   }
-  Hero.prototype = Object.create(Humanoid.prototype);
-  Hero.prototype.usePower = function () {
+  usePower() {
     return `${this.name} ${this.power}.`;
   }
-  Hero.prototype.givesSpeech = function () {
+  givesSpeech() {
     return `${this.name} says "${this.speech}"`;
   }
-  
-  // Villian
-  function Villain(attrs) {
-    Humanoid.call(this, attrs);
+}  
+// Villian
+class Villain extends Humanoid {
+  constructor(attrs) {
+    super(attrs);
     this.evilSpell = attrs.evilSpell;
     this.evilTrait = attrs.evilTrait;
   }
-  Villain.prototype = Object.create(Humanoid.prototype);
-  Villain.prototype.useSpell = function () {
+  useSpell() {
     return `${this.name} uses ${this.evilSpell}.`;
   }
-  Villain.prototype.doesEvilTrait = function () {
+  doesEvilTrait() {
     return `${this.name} ${this.evilTrait}`;
   }
-
+}
   const badGuy = new Villain({
     createdAt: new Date(),
     dimensions: {
